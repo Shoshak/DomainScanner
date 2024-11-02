@@ -5,12 +5,30 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace DomainScanner;
 
 public class MainForm : Form
 {
+    private void OpenUrl(string url)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            url = url.Replace("&", "^&");
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            Process.Start("xdg-open", url);
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Process.Start("open", url);
+        }
+    }
+    
     public MainForm()
     {
         Title = "Website checker";
@@ -36,7 +54,7 @@ public class MainForm : Form
         listBox.Activated += (_, _) =>
         {
             var websiteName = listBox.SelectedValue.ToString();
-            Process.Start(new ProcessStartInfo(websiteName) { UseShellExecute = true });
+            OpenUrl(websiteName);
         };
 
         button.Click += async (_, _) =>
