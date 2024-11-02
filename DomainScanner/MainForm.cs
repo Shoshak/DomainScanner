@@ -12,7 +12,7 @@ namespace DomainScanner;
 
 public class MainForm : Form
 {
-    private void OpenUrl(string url)
+    private static void OpenUrl(string url)
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -53,7 +53,9 @@ public class MainForm : Form
         };
         listBox.Activated += (_, _) =>
         {
-            var websiteName = listBox.SelectedValue.ToString();
+            var selectedBox = listBox.SelectedValue.ToString();
+            if (selectedBox == null) return;
+            var websiteName = selectedBox.Split(" ")[0];
             OpenUrl(websiteName);
         };
 
@@ -85,13 +87,11 @@ public class MainForm : Form
             var tasks = scanner.GetDomainsFound(websiteName).ToList();
             while (tasks.Any())
             {
-                var finishedTask = await Task.WhenAny(tasks);
-                tasks.Remove(finishedTask);
-                var resultingString = await finishedTask;
-                if (resultingString.Length > 0)
-                {
-                    listBox.Items.Add(await finishedTask);
-                }
+                var completed = await Task.WhenAny(tasks);
+                tasks.Remove(completed);
+                if (completed.IsFaulted) continue;
+                var result = await completed;
+                listBox.Items.Add(result.ToString());
             }
             MessageBox.Show(this, "Scanned all websites!");
             siteName.Enabled = true;
