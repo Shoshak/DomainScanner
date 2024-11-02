@@ -1,13 +1,12 @@
-﻿using Eto.Drawing;
-using Eto.Forms;
+﻿using Eto.Forms;
 using System;
 
 namespace DomainScanner
 {
-    internal class Program
+    internal static class Program
     {
         [STAThread]
-        static void Main(string[] args)
+        private static void Main()
         {
             new Application(Eto.Platform.Detect).Run(new MainForm());
         }
