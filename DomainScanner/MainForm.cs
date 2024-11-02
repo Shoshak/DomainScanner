@@ -85,7 +85,7 @@ public class MainForm : Form
             client.Timeout = new TimeSpan(0, 0, 5);
             Scanner scanner = new(client, domains);
             var tasks = scanner.GetDomainsFound(websiteName).ToList();
-            while (tasks.Any())
+            while (tasks.Count != 0)
             {
                 var completed = await Task.WhenAny(tasks);
                 tasks.Remove(completed);
